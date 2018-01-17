@@ -6,19 +6,45 @@ yum install -y http://yum.puppet.com/puppet5/puppet5-release-el-7.noarch.rpm
 yum install -y puppet-agent
 EOF
 $debian = <<EOF
-apt-get install -y https://apt.puppet.com/puppet5-release-stretch.deb
-apt-get install -y puppet-agent
+dpkg -s puppet-agent >/dev/null
+if [ $? -ne 0 ]; then
+  wget https://apt.puppet.com/puppet5-release-stretch.deb
+  dpkg -i puppet5-release-stretch.deb
+  apt-get update
+  apt-get install -y puppet-agent
+fi
+EOF
+$git = <<EOF
+dpkg -s puppet-agent >/dev/null
+if [ $? -ne 0 ]; then
+  wget https://apt.puppet.com/puppet5-release-stretch.deb
+  dpkg -i puppet5-release-stretch.deb
+  apt-get update
+  apt-get install -y puppet-agent
+fi
+/opt/puppetlabs/bin/puppet apply /home/vagrant/git.pp
 EOF
 Vagrant.configure("2") do |config|
   config.vm.define "centos" do |centos|
     centos.vm.box = "centos/7"
     centos.vm.provision "shell", inline: $rhel
     centos.vm.hostname = "cookbook.example.com"
+    centos.vm.network "private_network", ip: "192.168.50.10",
+      virtualbox__intnet: "puppet"
   end
 
   config.vm.define "debian" do |debian|
     debian.vm.box = "debian/stretch64"
     debian.vm.provision "shell", inline: $debian
     debian.vm.hostname = "cookbook.example.com"
+  end
+
+  config.vm.define "git" do |git|
+    git.vm.box = "debian/stretch64"
+    git.vm.provision "file", source: "git.pp", destination: "/home/vagrant/git.pp"
+    git.vm.provision "shell", inline: $git
+    git.vm.hostname = "git.example.com"
+    git.vm.network "private_network", ip: "192.168.50.5",
+      virtualbox__intnet: "puppet"
   end
 end
