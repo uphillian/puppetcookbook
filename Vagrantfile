@@ -47,4 +47,12 @@ Vagrant.configure("2") do |config|
     git.vm.network "private_network", ip: "192.168.50.5",
       virtualbox__intnet: "puppet"
   end
+
+  config.vm.define "testnode" do |testnode|
+    testnode.vm.box = "centos/7"
+    testnode.vm.provision "shell", inline: $rhel
+    testnode.vm.hostname = "testnode.example.com"
+    testnode.vm.network "private_network", ip: "192.168.50.20",
+      virtualbox__intnet: "puppet"
+  end
 end

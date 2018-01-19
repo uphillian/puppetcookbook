@@ -25,7 +25,7 @@ user {'git':
 }
 
 file {'git-ssh':
-  ensure => 'directory', 
+  ensure => 'directory',
   path   => '/usr/local/git/.ssh',
   mode   => '0700',
 }
@@ -95,11 +95,10 @@ exec {'download git.example.com host key':
   command => 'ssh-keyscan git.example.com >>/usr/local/git/.ssh/known_hosts',
   path    => '/usr/bin:/usr/sbin:/bin:/sbin',
   unless  => 'grep git.example.com /usr/local/git/.ssh/known_hosts',
-  require => File['git-ssh'],
-}
-file {'git-ssh-known_hosts':
-  path    => '/usr/local/git/.ssh/known_hosts',
-  require => Exec['download git.example.com host key']
+  user    => 'git',
+  require => [ User['git'], 
+               File['git-ssh']
+             ],
 }
 
 file {'cookbook':
@@ -108,10 +107,12 @@ file {'cookbook':
 }
 
 exec {'create cookbook':
-  command => 'sudo -u git git clone git@git.example.com:repos/puppet.git cookbook',
+  command => 'git clone git@git.example.com:repos/puppet.git cookbook',
   path    => '/usr/bin:/usr/sbin:/bin:/sbin',
   cwd     => '/usr/local/git',
-  require => [ Package['git'],
+  user    => 'git',
+  require => [ User['git'],
+               Package['git'],
                File['git-id_rsa'],
                Exec['download git.example.com host key']
              ],
