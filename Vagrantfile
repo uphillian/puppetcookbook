@@ -55,4 +55,15 @@ Vagrant.configure("2") do |config|
     testnode.vm.network "private_network", ip: "192.168.50.20",
       virtualbox__intnet: "puppet"
   end
+
+  config.vm.define "puppet" do |puppet|
+    puppet.vm.box = "centos/7"
+    puppet.vm.provision "shell", inline: $rhel
+    puppet.vm.hostname = "puppet.example.com"
+    puppet.vm.network "private_network", ip: "192.168.50.100",
+      virtualbox__intnet: "puppet"
+    puppet.vm.provider "virtualbox" do |v|
+      v.memory = 1500
+    end
+  end
 end
