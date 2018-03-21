@@ -37,6 +37,8 @@ Vagrant.configure("2") do |config|
     debian.vm.box = "debian/stretch64"
     debian.vm.provision "shell", inline: $debian
     debian.vm.hostname = "cookbook.example.com"
+    debian.vm.network "private_network", ip: "192.168.50.20",
+      virtualbox__intnet: "puppet"
   end
 
   config.vm.define "git" do |git|
@@ -52,7 +54,7 @@ Vagrant.configure("2") do |config|
     testnode.vm.box = "centos/7"
     testnode.vm.provision "shell", inline: $rhel
     testnode.vm.hostname = "testnode.example.com"
-    testnode.vm.network "private_network", ip: "192.168.50.20",
+    testnode.vm.network "private_network", ip: "192.168.50.30",
       virtualbox__intnet: "puppet"
   end
 
