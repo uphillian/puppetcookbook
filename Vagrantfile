@@ -25,11 +25,33 @@ fi
 /opt/puppetlabs/bin/puppet apply /home/vagrant/git.pp
 EOF
 Vagrant.configure("2") do |config|
-  config.vm.define "centos" do |centos|
-    centos.vm.box = "centos/7"
-    centos.vm.provision "shell", inline: $rhel
-    centos.vm.hostname = "cookbook.example.com"
-    centos.vm.network "private_network", ip: "192.168.50.10",
+  config.vm.define "cookbook" do |cookbook|
+    cookbook.vm.box = "centos/7"
+    cookbook.vm.provision "shell", inline: $rhel
+    cookbook.vm.hostname = "cookbook.example.com"
+    cookbook.vm.network "private_network", ip: "192.168.50.10",
+      virtualbox__intnet: "puppet"
+  end
+  config.vm.define "cookbook2" do |cookbook2|
+    cookbook2.vm.box = "centos/7"
+    cookbook2.vm.provision "shell", inline: $rhel
+    cookbook2.vm.hostname = "cookbook2.example.com"
+    cookbook2.vm.network "private_network", ip: "192.168.50.8",
+      virtualbox__intnet: "puppet"
+  end
+  config.vm.define "webserver" do |web|
+    web.vm.box = "centos/7"
+    web.vm.provision "shell", inline: $rhel
+    web.vm.hostname = "webserver.example.com"
+    web.vm.network "private_network", ip: "192.168.50.11",
+      virtualbox__intnet: "puppet"
+  end
+
+  config.vm.define "dbserver" do |db|
+    db.vm.box = "centos/7"
+    db.vm.provision "shell", inline: $rhel
+    db.vm.hostname = "dbserver.example.com"
+    db.vm.network "private_network", ip: "192.168.50.12",
       virtualbox__intnet: "puppet"
   end
 
