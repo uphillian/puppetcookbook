@@ -1,3 +1,4 @@
+# nfs server config for RedHat
 class nfs::server::redhat {
   package {'nfs-utils':
     ensure => 'installed',
@@ -8,7 +9,7 @@ class nfs::server::redhat {
   }
   file {'/etc/sysconfig/nfs':
     source => 'puppet:///modules/nfs/nfs',
-    mode   => 0644,
+    mode   => '0644',
     notify => Service['nfs'],
   }
 }

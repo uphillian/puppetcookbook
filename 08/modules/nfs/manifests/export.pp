@@ -1,26 +1,28 @@
+# a single export resource
 define nfs::export (
-  $where = $title,
-  $who = '*',
-  $options = 'async,ro',
-  $mount_options = 'defaults',
-  $tag     = 'nfs'
+  String $where         = $title,
+  String $who           = '*',
+  String $options       = 'async,ro',
+  String $mount_options = 'defaults',
+  String $tag           = 'nfs'
 ) {
   # make sure the directory exists
   # export the entry locally, then export a resource to be picked up later.
-  file {"$where":
+  file {$where:
     ensure => 'directory',
   }
   include nfs::exports
-  concat::fragment { "nfs::export::$where":
+  concat::fragment { "nfs::export::${where}":
     content => "${where} ${who}(${options})\n",
     target  => '/etc/exports'
+    require => File[$where],
   }
   @@mount { "nfs::export::${where}::${::ipaddress}":
-    name    => "$where",
     ensure  => 'mounted',
+    name    => $where,
     fstype  => 'nfs',
-    options => "$mount_options",
+    options => $mount_options,
     device  => "${::ipaddress}:${where}",
-    tag     => "$tag",
+    tag     => $tag,
   }
 }

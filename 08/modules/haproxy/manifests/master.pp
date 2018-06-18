@@ -1,12 +1,15 @@
-class haproxy::master ($app = 'myapp') {
+# the master member of the proxy group
+class haproxy::master (
+  String $app = 'myapp'
+) {
   # The HAProxy master server
   # will collected haproxy::slave resources and add to it's balancer
   package { 'haproxy': ensure => installed }
 
-#  file { '/etc/default/haproxy':
-#    content => "ENABLED=1\n",
-#    require => Package['haproxy'],
-#  }
+  selinux::boolean{ 'haproxy_connect_any':
+    ensure => 'on',
+    before => Service['haproxy'],
+  }
 
   service { 'haproxy':
     ensure  => running,
@@ -25,7 +28,7 @@ class haproxy::master ($app = 'myapp') {
   }
 
   # pull in the exported entries
-  Concat::Fragment <<| tag == "$app" |>> {
+  Concat::Fragment <<| tag == $app |>> {
     target => 'haproxy.cfg',
     notify => Service['haproxy'],
   }
@@ -34,13 +37,12 @@ class haproxy::master ($app = 'myapp') {
   include myfw
   firewall {'8080 haproxy statistics':
     proto  => 'tcp',
-    port   => 8080,
+    dport  => 8080,
     action => 'accept'
   }
   firewall {'0080 http haproxy':
     proto  => 'tcp',
-    port   => 80,
+    dport  => 80,
     action => 'accept'
   }
-
 }

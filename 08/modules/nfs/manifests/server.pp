@@ -1,3 +1,4 @@
+# nfs server
 class nfs::server {
   # ensure nfs server is running
   # firewall should allow nfs communication
@@ -5,6 +6,7 @@ class nfs::server {
   case $::osfamily {
     'RedHat': { include nfs::server::redhat }
     'Debian': { include nfs::server::debian }
+    default: { fail('nfs::server only works on RedHat or Debian') }
   }
   include myfw
   firewall {'2049 NFS TCP communication':

@@ -1,3 +1,4 @@
+# myfw - my firewall
 class myfw {
   include firewall
   # our rulesets
@@ -5,13 +6,13 @@ class myfw {
   include myfw::pre
 
   # clear all the rules
-  resources { "firewall":
+  resources { 'firewall':
     purge => true
   }
-  
+
   # resource defaults
   Firewall {
-    before => Class['myfw::post'],
+    before  => Class['myfw::post'],
     require => Class['myfw::pre'],
   }
 }
